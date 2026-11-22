@@ -44,6 +44,10 @@ button:focus-visible{outline:2px solid var(--fg2);outline-offset:1px}
 .ph .back{padding-left:0;text-align:left}
 .ptitle{font-size:16px;font-weight:600;margin:4px 0 0;text-wrap:balance}
 .pmeta{font-size:12px;color:var(--fg3);line-height:1.5;margin:0}
+.pcount{font-size:13px;color:var(--fg);margin:10px 0 0}
+.pcount b{font-weight:700}
+.wl{color:var(--fg2);text-decoration:underline;text-underline-offset:2px}
+.wl:hover{color:var(--fg)}
 .sec{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg3);margin:10px 0 0}
 .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;width:100%;text-align:left;border:0;background:transparent;color:var(--fg);padding:6px 8px;border-radius:6px;font-size:13px;line-height:1.35}
 .row:hover{background:var(--l1)}
@@ -87,6 +91,7 @@ details.about p{margin:6px 0 0;max-width:760px;line-height:1.5}
 (function(){
 var C={'Arts':'#7F77DD','Building Bridges':'#BA7517','Child Well-being':'#D85A30','Environment':'#1D9E75','Medical Research':'#378ADD'};
 var E={'Ford Foundation':[18,'2026, foundation-reported'],'Hewlett':[13.3,'Dec 2024'],'Moore':[9.5,'Dec 2024'],'Mellon':[7.8,'end 2025'],'Packard':[6.3,'Dec 2024'],'MacArthur':[6.0,'Dec 2024'],'Walton Family':[6.1,'total assets, 2024'],'Duke Endowment':[5.4,'total assets, Dec 2025'],'Templeton':[3.6,'total assets, 2024'],'Wyss':[2.4,'total assets, 2024'],'Annie E. Casey':[2.3,'total assets, 2024'],'Lumina':[1.5,'total assets, 2024'],'Surdna':[1.2,'total assets, Jun 2025'],'Burroughs Wellcome':[0.85,'total assets, 2024'],'Spencer':[0.66,'total assets, 2025'],'Siegel Family':[0.57,'total assets, 2024'],'Warhol Foundation':[0.36,'total assets, 2023'],'Mozilla':[0.12,'total assets, 2024']};
+var WEB={'Ford Foundation':'https://www.fordfoundation.org','Hewlett':'https://hewlett.org','Moore':'https://www.moore.org','Mellon':'https://www.mellon.org','Packard':'https://www.packard.org','MacArthur':'https://www.macfound.org','Walton Family':'https://www.waltonfamilyfoundation.org','Duke Endowment':'https://www.dukeendowment.org','Templeton':'https://www.templeton.org','Wyss':'https://www.wyssfoundation.org','Annie E. Casey':'https://www.aecf.org','Lumina':'https://www.luminafoundation.org','Surdna':'https://surdna.org','Burroughs Wellcome':'https://www.bwfund.org','Spencer':'https://www.spencer.org','Siegel Family':'https://www.siegelendowment.org','Warhol Foundation':'https://warholfoundation.org','Mozilla':'https://foundation.mozilla.org','Kapor':'https://www.kaporcenter.org','Omidyar Network':'https://omidyar.com','Alaska Conservation Fdn':'https://alaskaconservation.org','Christensen Fund':'https://www.christensenfund.org','Decolonizing Wealth':'https://decolonizingwealth.com','Joan Mitchell Fdn':'https://www.joanmitchellfoundation.org','Rauschenberg Fdn':'https://www.rauschenbergfoundation.org','American Heart Assoc.':'https://www.heart.org','American Cancer Society':'https://www.cancer.org','Rita Allen':'https://www.ritaallenfoundation.org','W.T. Grant':'https://wtgrantfoundation.org','Bezos Family':'https://www.bezosfamilyfoundation.org','Dana':'https://dana.org','Donaghue':'https://donaghue.org','Prebys':'https://www.prebysfoundation.org','Robertson':'https://robertsonfoundation.org','Susan G. Komen':'https://www.komen.org'};
 function R(b){return 4.5+4*Math.sqrt(b);}
 ['l1','l2','l3'].forEach(function(id,i){var d=2*R([0.5,5,15][i]);var e=document.getElementById(id);e.style.width=d+'px';e.style.height=d+'px';});
 var P=[
@@ -270,14 +275,17 @@ function drawPanel(){
  }else if(v.t==='programs'){
   var ps=cur.sel.slice().sort(function(a,b){return b.t-a.t;});
   panelEl.appendChild(h('p','ptitle','Programs'));
-  panelEl.appendChild(h('p','pmeta',ps.length+' programs, largest first'));
+  panelEl.appendChild(h('p','pmeta',ps.length+(ps.length===1?' program':' programs')+', largest first'));
   ps.forEach(function(p){panelEl.appendChild(row(p.n,money(p.t),function(){setView({t:'program',n:p.n,back:{t:'programs'}});},[p.d]));});
  }else if(v.t==='funder'){
   var f=nodeById(v.id);
   panelEl.appendChild(h('p','ptitle',f.id));
-  panelEl.appendChild(h('p','pmeta',f.e?'Endowment about $'+f.e[0]+'B ('+f.e[1]+')':'Endowment not found'));
-  if(f.t>0)panelEl.appendChild(h('p','pmeta','Combined size of its programs with DDF: '+money(f.t)));
-  panelEl.appendChild(h('p','sec','Programs with DDF'));
+  var em=h('p','pmeta',f.e?'Endowment about $'+f.e[0]+'B ('+f.e[1]+')':'Endowment not found');
+  if(WEB[f.id]){em.appendChild(document.createTextNode(' · '));var wa=h('a','wl','Website ↗');wa.href=WEB[f.id];wa.target='_blank';wa.rel='noopener noreferrer';em.appendChild(wa);}
+  panelEl.appendChild(em);
+  var pc=h('p','pcount');pc.appendChild(h('b',null,String(f.progs.length)));pc.appendChild(document.createTextNode(' program'+(f.progs.length===1?'':'s')+' with DDF'));
+  panelEl.appendChild(pc);
+  if(f.t>0)panelEl.appendChild(h('p','pmeta','Combined size: '+money(f.t)));
   f.progs.forEach(function(n){var p=progByName(n);panelEl.appendChild(row(n,p?money(p.t):'',function(){setView({t:'program',n:n,back:v});},p?[p.d]:[]));});
   var co=[];f.co.forEach(function(l){var o=l.a===f?l.b:l.a;if(co.indexOf(o)<0)co.push(o);});
   if(co.length){panelEl.appendChild(h('p','sec','Co-funders'));

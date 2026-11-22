@@ -66,6 +66,7 @@ details.about p{margin:6px 0 0;max-width:760px;line-height:1.5}
 <label for="fy1">Launched from <select id="fy1"></select></label>
 <label for="fy2">to <select id="fy2"></select></label>
 <button id="play" type="button">Play timeline</button>
+<button id="reset" type="button">Reset</button>
 </div>
 <div id="leg"></div>
 <details class="about"><summary>About this data</summary>
@@ -299,6 +300,7 @@ function startPlay(){
  step();timer=setInterval(step,1500);
 }
 playBtn.addEventListener('click',function(){if(timer)stopPlay();else startPlay();});
+document.getElementById('reset').addEventListener('click',function(){pinned=null;hov=null;tipEl.hidden=true;if(curRefresh)curRefresh();});
 [sp,s1,s2].forEach(function(s){s.addEventListener('change',function(){stopPlay();render();});});
 render();
 })();

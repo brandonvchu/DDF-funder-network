@@ -1,0 +1,296 @@
+<title>DDF Funder Network</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap">
+<style>
+/* Layout: single centered column, filters on top, network below, notes at the bottom. */
+:root{
+  --bg:#fbfbfa; --fg:#1b1c1f; --fg2:#4a4d55; --fg3:#74777f; --lab:#70737b; --lab1:#9a9da5;
+  --l1:#e2e3e6; --l2:#c9cbd1; --ctl:#ffffff; --yr:#d3d5da;
+  --font:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141518; --fg:#ececee; --fg2:#b5b8bf; --fg3:#8b8e96; --l1:#2c2e34; --l2:#45484f; --ctl:#1d1e23; --yr:#3b3e45; --lab:#e6e7ea; --lab1:#c4c6cb; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141518; --fg:#ececee; --fg2:#b5b8bf; --fg3:#8b8e96; --l1:#2c2e34; --l2:#45484f; --ctl:#1d1e23; --yr:#3b3e45; --lab:#e6e7ea; --lab1:#c4c6cb; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:14px;
+  padding-block:24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+h1{font-size:44px;line-height:1.1;font-weight:600;margin:0 0 8px;text-align:center;text-wrap:balance}
+.sub{margin:0;color:var(--fg2);line-height:1.5}
+.bar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;font-size:13px;color:var(--fg2)}
+.bar label{display:flex;align-items:center;gap:8px}
+select{font:inherit;color:var(--fg);background:var(--ctl);border:1px solid var(--l2);border-radius:6px;padding:4px 8px}
+select:focus-visible{outline:2px solid var(--fg2);outline-offset:1px}
+#leg,.keys{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px}
+#leg{color:var(--fg2)} .keys{color:var(--fg3);align-items:center}
+.keys span,#leg span{display:flex;align-items:center;gap:6px}
+svg{display:block;max-width:100%;height:auto}
+.wrap{position:relative;flex:0 1 760px;min-width:0;width:100%}
+#yr{position:absolute;top:0;left:0;font:300 50px/1 Helvetica,Arial,sans-serif;color:var(--yr);pointer-events:none;font-variant-numeric:tabular-nums}
+button{font:inherit;color:var(--fg);background:var(--ctl);border:1px solid var(--l2);border-radius:6px;padding:4px 12px;cursor:pointer}
+button:focus-visible{outline:2px solid var(--fg2);outline-offset:1px}
+.sub,.note,#info{max-width:760px}
+#tip{position:absolute;z-index:3;pointer-events:none;background:var(--ctl);color:var(--fg);border:1px solid var(--l2);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.5;max-width:270px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+#tip .tn{font-weight:600;font-size:13px}
+#tip .tm{color:var(--fg3)}
+#tip .tp{display:flex;align-items:baseline;gap:0}
+.stage{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+#stats{position:absolute;top:0;right:0;display:flex;gap:4px;z-index:2}
+.lite{border:0;background:transparent;color:var(--fg2);padding:4px 8px;border-radius:6px;font-size:13px}
+.lite:hover{background:var(--l1);color:var(--fg)}
+.lite.on{background:var(--l1);color:var(--fg);font-weight:500}
+#panel{flex:1 1 260px;max-width:340px;min-width:240px;border-left:1px solid var(--l1);padding-left:16px;max-height:640px;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:28px}
+.ph .back{padding-left:0;text-align:left}
+.ptitle{font-size:16px;font-weight:600;margin:4px 0 0;text-wrap:balance}
+.pmeta{font-size:12px;color:var(--fg3);line-height:1.5;margin:0}
+.sec{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg3);margin:10px 0 0}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;width:100%;text-align:left;border:0;background:transparent;color:var(--fg);padding:6px 8px;border-radius:6px;font-size:13px;line-height:1.35}
+.row:hover{background:var(--l1)}
+.row .m{color:var(--fg3);font-size:12px;white-space:nowrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+#info{font-size:13px;color:var(--fg2);margin:0;min-height:40px;line-height:1.5}
+.note{font-size:12px;color:var(--fg3);margin:0;line-height:1.5}
+</style>
+<main>
+<h1>Doris Duke Foundation co-funders</h1>
+<div class="bar">
+<label for="fp">DDF program <select id="fp"><option value="All">All programs</option><option>Arts</option><option>Building Bridges</option><option>Child Well-being</option><option>Environment</option><option>Medical Research</option></select></label>
+<label for="fy1">Launched from <select id="fy1"></select></label>
+<label for="fy2">to <select id="fy2"></select></label>
+<button id="play" type="button">Play timeline</button>
+</div>
+<div id="leg"></div>
+<div class="stage"><div class="wrap"><div id="yr" aria-hidden="true"></div><div id="tip" hidden></div><div id="stats"><button type="button" id="fbtn" class="lite"></button><button type="button" id="pbtn" class="lite"></button></div><svg id="net" viewBox="0 -60 680 760" width="100%" role="img" aria-label="Spring-layout network of DDF and co-funders clustered by program, nodes colored by DDF program and sized by endowment"><title>DDF co-funding network by program</title></svg></div><aside id="panel" hidden aria-label="Details"></aside></div>
+<div class="keys">
+<span>Dot area = endowment:</span>
+<span><span id="l1" style="display:inline-block;border-radius:50%;background:var(--fg2)"></span>$0.5B</span>
+<span><span id="l2" style="display:inline-block;border-radius:50%;background:var(--fg2)"></span>$5B</span>
+<span><span id="l3" style="display:inline-block;border-radius:50%;background:var(--fg2)"></span>$15B</span>
+<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--fg3)"></span>outline = not found</span>
+<span>Split circle = funds in more than one program</span>
+</div>
+<p id="info">Hover a funder, then click it for more info. Click again, or click empty space, to clear.</p>
+<p class="note">Darker edges: funder to DDF. Lighter edges: funders in the same program. Edge width = combined size of shared programs (log scale); dashed = amount not disclosed. DDF is drawn at a fixed size. Endowment figures mix endowment and total assets from 2024 to 2026.</p>
+</main>
+<script>
+(function(){
+var C={'Arts':'#7F77DD','Building Bridges':'#BA7517','Child Well-being':'#D85A30','Environment':'#1D9E75','Medical Research':'#378ADD'};
+var E={'Ford Foundation':[18,'2026, foundation-reported'],'Hewlett':[13.3,'Dec 2024'],'Moore':[9.5,'Dec 2024'],'Mellon':[7.8,'end 2025'],'Packard':[6.3,'Dec 2024'],'MacArthur':[6.0,'Dec 2024'],'Walton Family':[6.1,'total assets, 2024'],'Duke Endowment':[5.4,'total assets, Dec 2025'],'Templeton':[3.6,'total assets, 2024'],'Wyss':[2.4,'total assets, 2024'],'Annie E. Casey':[2.3,'total assets, 2024'],'Lumina':[1.5,'total assets, 2024'],'Surdna':[1.2,'total assets, Jun 2025'],'Burroughs Wellcome':[0.85,'total assets, 2024'],'Spencer':[0.66,'total assets, 2025'],'Siegel Family':[0.57,'total assets, 2024'],'Warhol Foundation':[0.36,'total assets, 2023'],'Mozilla':[0.12,'total assets, 2024']};
+function R(b){return 3+3.6*Math.sqrt(b);}
+['l1','l2','l3'].forEach(function(id,i){var d=2*R([0.5,5,15][i]);var e=document.getElementById(id);e.style.width=d+'px';e.style.height=d+'px';});
+var P=[
+{n:'Humanity AI',t:500,y:2025,d:'Arts',f:['Ford Foundation','Lumina','Kapor','MacArthur','Mellon','Mozilla','Omidyar Network','Packard','Siegel Family']},
+{n:'Tribal Nations Conservation Pledge',t:102.5,y:2023,d:'Environment',f:['Alaska Conservation Fdn','Christensen Fund','Decolonizing Wealth','Moore','Hewlett','Packard','Walton Family','Wyss','Grousemont']},
+{n:'OPT-In for Families',t:33,y:2024,d:'Child Well-being',f:['Duke Endowment','Aviv Foundation']},
+{n:'Artist Relief',t:25,y:2020,d:'Arts',f:['Mellon','Ford Foundation','Warhol Foundation','Arison Arts','Joan Mitchell Fdn','Rauschenberg Fdn']},
+{n:'Artists Make Technology',t:11,y:2026,d:'Arts',f:['Mozilla','Hewlett','Ford Foundation']},
+{n:'COVID-19 Fund to Retain Clinical Scientists',t:11,y:2021,d:'Medical Research',f:['American Heart Assoc.','Burroughs Wellcome','Templeton','Rita Allen','Walder']},
+{n:'DDF-Ford performing arts tech grants',t:4,y:2026,d:'Arts',f:['Ford Foundation']},
+{n:'Institutional Challenge Grants',t:2.6,y:2025,d:'Child Well-being',f:['W.T. Grant','Annie E. Casey','Bezos Family','Spencer']},
+{n:'Talented Students in the Arts (amount n/d)',t:0,y:2001,d:'Arts',f:['Surdna']},
+{n:'Pathways for Health Research (amount n/d)',t:0,y:2025,d:'Medical Research',f:['American Cancer Society','American Heart Assoc.','Burroughs Wellcome','Dana','Donaghue','Prebys','Robertson','Susan G. Komen']}
+];
+var W=680,H=700,cx=W/2,cy=H/2,ns='http://www.w3.org/2000/svg';
+var svg=document.getElementById('net'),info=document.getElementById('info'),sp=document.getElementById('fp'),s1=document.getElementById('fy1'),s2=document.getElementById('fy2'),fBtn=document.getElementById('fbtn'),pBtn=document.getElementById('pbtn'),panelEl=document.getElementById('panel'),leg=document.getElementById('leg');
+[2001,2020,2021,2023,2024,2025,2026].forEach(function(y){[s1,s2].forEach(function(s){var o=document.createElement('option');o.value=y;o.textContent=y;s.appendChild(o);});});
+s1.value=2001;s2.value=2026;
+function lw(t){return t>0?0.8+1.8*Math.log10(1+t):0.8;}
+function cw(t){return t>0?0.4+0.6*Math.log10(1+t):0.5;}
+function L(t){return t>0?250-30*Math.log10(1+t):260;}
+function fmt(t){return '$'+(Math.round(t*10)/10)+'M';}
+function el(t,a,p){var e=document.createElementNS(ns,t);for(var k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e;}
+var DEF='Hover a funder, then click it for more info. Click again, or click empty space, to clear.';
+var pinned=null,hov=null,curRefresh=null;
+function render(){
+ pinned=null;hov=null;curRefresh=null;
+ svg.setAttribute('viewBox','0 -60 680 760');
+ while(svg.childNodes.length>1)svg.removeChild(svg.lastChild);
+ var y1=+s1.value,y2=+s2.value,pr=sp.value;
+ var sel=P.filter(function(p){return (pr==='All'||p.d===pr)&&p.y>=y1&&p.y<=y2;});
+ var m={},nodes=[{id:'DDF',x:cx,y:cy,fixed:true,t:0,progs:[],co:[],r:9}],pairs={},present={};
+ sel.forEach(function(p){
+  present[p.d]=1;
+  p.f.forEach(function(f){if(!m[f]){m[f]={id:f,t:0,progs:[],ds:[],co:[],x:0,y:0,e:E[f],r:E[f]?R(E[f][0]):4.5,lw:f.length*6};nodes.push(m[f]);}m[f].t+=p.t;m[f].progs.push(p.n);if(m[f].ds.indexOf(p.d)<0)m[f].ds.push(p.d);});
+  for(var i=0;i<p.f.length;i++)for(var j=i+1;j<p.f.length;j++){
+   var k=[p.f[i],p.f[j]].sort().join('|');
+   if(!pairs[k])pairs[k]={a:m[p.f[i]],b:m[p.f[j]],t:0,progs:[]};
+   pairs[k].t+=p.t;pairs[k].progs.push(p.n);}});
+ leg.innerHTML='';
+ Object.keys(C).forEach(function(k){if(!present[k])return;var s=document.createElement('span');s.innerHTML='<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+C[k]+'"></span>'+k;leg.appendChild(s);});
+ var links=Object.keys(pairs).map(function(k){return pairs[k];});
+ links.forEach(function(l){l.a.co.push(l);l.b.co.push(l);});
+ var N=nodes.length;
+ cur={sel:sel,nodes:nodes};fBtn.textContent=(N-1)+' funders';pBtn.textContent=sel.length+' programs';
+ if(!sel.length){refreshPanel();info.textContent='No co-funded programs match these filters.';el('text',{x:cx,y:cy,'text-anchor':'middle','font-size':13,style:'fill:var(--fg3)'}).textContent='No co-funded programs match';return;}
+ info.textContent=DEF;
+ var small=N<14,Ls=small?0.8:1,RS=N>14?0.04:1;
+ nodes.forEach(function(n,i){if(i){var a=i*2.39996,r=(small?90:140)+(i%4)*(small?25:40);n.x=cx+r*Math.cos(a);n.y=cy+r*Math.sin(a);}});
+ for(var it=0;it<900;it++){
+  var al=1-it/900;
+  nodes.forEach(function(n){n.fx=0;n.fy=0;});
+  for(var i=0;i<N;i++)for(var j=i+1;j<N;j++){
+   var a=nodes[i],b=nodes[j],dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy+0.5,k=(i===0?1000:3200*RS)/d2;
+   a.fx-=k*dx;a.fy-=k*dy;b.fx+=k*dx;b.fy+=k*dy;
+   var d=Math.sqrt(d2),mn=a.r+b.r+14;
+   if(d<mn){var q=(mn-d)*0.5/d;a.fx-=q*dx;a.fy-=q*dy;b.fx+=q*dx;b.fy+=q*dy;}}
+  for(var i=1;i<N;i++){var b=nodes[i],dx=b.x-cx,dy=b.y-cy,d=Math.sqrt(dx*dx+dy*dy)+0.01,s=(d-L(b.t)*Ls)*0.15;b.fx-=s*dx/d;b.fy-=s*dy/d;}
+  links.forEach(function(l){var a=l.a,b=l.b,dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)+0.01,s=(d-(62+(a.r+b.r)*0.5))*0.09;a.fx+=s*dx/d;a.fy+=s*dy/d;b.fx-=s*dx/d;b.fy-=s*dy/d;});
+  nodes.forEach(function(n){if(n.fixed)return;
+   var f=Math.sqrt(n.fx*n.fx+n.fy*n.fy)+0.01,c=Math.min(f,12)*al/f;n.x+=n.fx*c;n.y+=n.fy*c;n.x=Math.max(-200,Math.min(W+200,n.x));n.y=Math.max(-200,Math.min(H+200,n.y));});
+ }
+ var bx0=cx,bx1=cx,by0=cy,by1=cy;
+ nodes.forEach(function(n,i){
+  var left=n.x-n.r-4,right=n.x+n.r+4;
+  if(i){if(n.x>=cx)right=n.x+n.r+5+n.lw;else left=n.x-n.r-5-n.lw;}
+  bx0=Math.min(bx0,left);bx1=Math.max(bx1,right);by0=Math.min(by0,n.y-n.r-4);by1=Math.max(by1,n.y+n.r+22);
+ });
+ var half=Math.max(cx-bx0,bx1-cx,W/2)+12,vy0=Math.min(by0-60,-60),vy1=Math.max(by1+10,H);
+ svg.setAttribute('viewBox',(cx-half)+' '+vy0+' '+(2*half)+' '+(vy1-vy0));
+ links.forEach(function(l){l.el=el('line',{x1:l.a.x,y1:l.a.y,x2:l.b.x,y2:l.b.y,'stroke-linecap':'round','stroke-width':(cw(l.t)*0.85).toFixed(2),style:'stroke:var(--fg3);stroke-opacity:0.22'+(l.t>0?'':';stroke-dasharray:2 3')});});
+ for(var i=1;i<N;i++){var n=nodes[i];n.edge=el('line',{x1:cx,y1:cy,x2:n.x,y2:n.y,'stroke-linecap':'round','stroke-width':lw(n.t).toFixed(2),style:'stroke:var(--l2)'+(n.t>0?'':';stroke-dasharray:3 4')});}
+ function tip(a,b,progs,t){return (a+' and '+b+': '+progs.join('; ')+(t>0?' (combined size '+fmt(t)+')':' (amount not disclosed)'));}
+ function hitLine(x1,y1,x2,y2,lineEl,text,base,hover){
+  var h=el('line',{x1:x1,y1:y1,x2:x2,y2:y2,'stroke-width':12,'stroke-linecap':'round',style:'stroke:transparent;cursor:default'});
+  el('title',{},h).textContent=text;
+  h.addEventListener('mouseenter',function(){lineEl.style.stroke='var(--fg3)';lineEl.style.strokeOpacity='0.6';info.textContent=text;});
+  h.addEventListener('mouseleave',function(){if(curRefresh)curRefresh();});
+ }
+ links.forEach(function(l){hitLine(l.a.x,l.a.y,l.b.x,l.b.y,l.el,tip(l.a.id,l.b.id,l.progs,l.t),'var(--l1)');});
+ for(var i=1;i<N;i++){var n=nodes[i];hitLine(cx,cy,n.x,n.y,n.edge,tip('Doris Duke Foundation',n.id,n.progs,n.t),'var(--l2)');}
+ function detail(n){return n.id+' ('+n.ds.join(', ')+'): '+n.progs.join('; ')+(n.t>0?' (combined program size '+fmt(n.t)+')':' (program amount not disclosed)')+'. '+(n.e?'Endowment about $'+n.e[0]+'B ('+n.e[1]+').':'Endowment not found.');}
+ function refresh(){
+  var f=hov||pinned;
+  nodes.forEach(function(n,i){
+   var on=!f||n===f||i===0||f.co.some(function(l){return l.a===n||l.b===n;});
+   n.g.style.opacity=on?1:0.22;
+   if(i){
+    n.dot.style.opacity=n===f?1:0.88;
+    n.lab.style.fill=n===f?'var(--fg)':(n.progs.length>1?'var(--lab)':'var(--lab1)');
+    n.lab.style.fontWeight=n.progs.length>1?'600':(n===f?'400':'300');
+    n.edge.style.stroke=n===f?'var(--fg3)':'var(--l2)';
+    n.edge.style.strokeOpacity=n===f?'0.5':(on?'1':'0.2');
+   }
+  });
+  links.forEach(function(l){
+   var hot=f&&(l.a===f||l.b===f);
+   l.el.style.stroke='var(--fg3)';
+   l.el.style.strokeOpacity=hot?'0.5':(f?'0.07':'0.22');
+  });
+  info.textContent=f?detail(f)+(f===pinned?' Click again to clear.':''):DEF;
+ }
+ nodes.forEach(function(n,i){
+  var g=el('g',{style:i?'cursor:pointer':'cursor:default'});n.g=g;
+  if(!i)n.dot=el('circle',{cx:n.x,cy:n.y,r:n.r,style:'fill:var(--fg)'},g);
+  else if(!n.e)n.dot=el('circle',{cx:n.x,cy:n.y,r:n.r,'stroke-width':1.6,style:'fill:transparent;stroke:'+C[n.ds[0]]},g);
+  else if(n.ds.length===1)n.dot=el('circle',{cx:n.x,cy:n.y,r:n.r,style:'fill:'+C[n.ds[0]]},g);
+  else{
+   n.dot=el('g',{},g);var k=n.ds.length;
+   n.ds.forEach(function(d,j){
+    var a0=-Math.PI/2+j*2*Math.PI/k,a1=-Math.PI/2+(j+1)*2*Math.PI/k;
+    el('path',{d:'M'+n.x+' '+n.y+' L'+(n.x+n.r*Math.cos(a0))+' '+(n.y+n.r*Math.sin(a0))+' A'+n.r+' '+n.r+' 0 '+(1/k>0.5?1:0)+' 1 '+(n.x+n.r*Math.cos(a1))+' '+(n.y+n.r*Math.sin(a1))+' Z',style:'fill:'+C[d]},n.dot);});
+  }
+  if(i)n.dot.style.opacity=0.88;
+  var right=n.x>=cx;
+  n.lab=el('text',{x:i?(right?n.x+n.r+5:n.x-n.r-5):n.x,y:i?n.y+4:n.y+24,'text-anchor':i?(right?'start':'end'):'middle','font-size':i?11:13,'font-weight':i?(n.progs.length>1?600:300):500,style:'fill:'+(i?(n.progs.length>1?'var(--lab)':'var(--lab1)'):'var(--fg)')},g);
+  n.lab.textContent=i?n.id:'Doris Duke Foundation';
+  if(i){el('circle',{cx:n.x,cy:n.y,r:n.r+6,fill:'transparent'},g);
+   g.setAttribute('tabindex','0');g.setAttribute('role','button');g.setAttribute('aria-label',n.id+': show details');
+   g.addEventListener('mouseenter',function(e){hov=n;refresh();showTip(n,e);});
+   g.addEventListener('mousemove',moveTip);
+   g.addEventListener('mouseleave',function(){hov=null;refresh();tipEl.hidden=true;});
+   g.addEventListener('click',function(e){e.stopPropagation();pinned=(pinned===n)?null:n;refresh();});
+   g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pinned=(pinned===n)?null:n;refresh();}});}
+ });
+ curRefresh=refresh;refresh();refreshPanel();
+}
+svg.addEventListener('click',function(){pinned=null;if(curRefresh)curRefresh();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){pinned=null;if(curRefresh)curRefresh();}});
+var view=null,cur={sel:[],nodes:[]},tipEl=document.getElementById('tip');
+function showTip(n,e){
+ tipEl.innerHTML='';
+ tipEl.appendChild(h('div','tn',n.id));
+ tipEl.appendChild(h('div','tm',n.e?'Endowment about $'+n.e[0]+'B':'Endowment not found'));
+ n.progs.forEach(function(name){var p=progByName(name),r=h('div','tp');if(p)r.appendChild(dotEl(p.d));r.appendChild(document.createTextNode(name));tipEl.appendChild(r);});
+ tipEl.hidden=false;moveTip(e);
+}
+function moveTip(e){
+ var r=tipEl.parentNode.getBoundingClientRect(),x=e.clientX-r.left+14,y=e.clientY-r.top+14;
+ if(x+tipEl.offsetWidth>r.width)x=e.clientX-r.left-tipEl.offsetWidth-14;
+ if(y+tipEl.offsetHeight>r.height)y=e.clientY-r.top-tipEl.offsetHeight-14;
+ tipEl.style.left=Math.max(0,x)+'px';tipEl.style.top=Math.max(0,y)+'px';
+}
+function h(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
+function dotEl(d){var s=h('span','dot');s.style.background=C[d];return s;}
+function money(t){return t>0?(t>=1000?'$'+(t/1000)+'B':'$'+(Math.round(t*10)/10)+'M'):'amount n/d';}
+function nodeById(id){for(var i=1;i<cur.nodes.length;i++)if(cur.nodes[i].id===id)return cur.nodes[i];return null;}
+function progByName(n){for(var i=0;i<cur.sel.length;i++)if(cur.sel[i].n===n)return cur.sel[i];return null;}
+function valid(v){if(!v)return false;if(v.t==='funder')return !!nodeById(v.id);if(v.t==='program')return !!progByName(v.n);return true;}
+function backLabel(v){return v.t==='funders'?'Funders list':v.t==='programs'?'Programs list':v.t==='funder'?v.id:v.n;}
+function setView(v){view=v;pinned=(v&&v.t==='funder')?nodeById(v.id):null;if(curRefresh)curRefresh();drawPanel();}
+function refreshPanel(){
+ if(view&&!valid(view))view={t:view.t==='funder'||view.t==='funders'?'funders':'programs'};
+ setView(view);
+}
+function row(left,meta,fn,dots){
+ var b=h('button','row');b.type='button';
+ var l=h('span');(dots||[]).forEach(function(d){l.appendChild(dotEl(d));});l.appendChild(document.createTextNode(left));b.appendChild(l);
+ if(meta)b.appendChild(h('span','m',meta));
+ b.onclick=fn;return b;
+}
+function drawPanel(){
+ var inF=!!view&&(view.t==='funders'||view.t==='funder'),inP=!!view&&(view.t==='programs'||view.t==='program');
+ fBtn.classList.toggle('on',inF);pBtn.classList.toggle('on',inP);
+ panelEl.innerHTML='';
+ if(!view){panelEl.hidden=true;return;}
+ panelEl.hidden=false;
+ var hd=h('div','ph');
+ if(view.back){var bk=h('button','lite back','← '+backLabel(view.back));bk.type='button';bk.onclick=function(){setView(valid(view.back)?view.back:{t:view.t==='funder'?'funders':'programs'});};hd.appendChild(bk);}else hd.appendChild(h('span'));
+ var x=h('button','lite','Close');x.type='button';x.onclick=function(){setView(null);};hd.appendChild(x);
+ panelEl.appendChild(hd);
+ var v=view,i;
+ if(v.t==='funders'){
+  var fs=cur.nodes.slice(1).sort(function(a,b){return (b.progs.length-a.progs.length)||(a.id<b.id?-1:a.id>b.id?1:0);});
+  panelEl.appendChild(h('p','ptitle','Funders'));
+  fs.forEach(function(n){panelEl.appendChild(row(n.id,n.progs.length+(n.progs.length>1?' programs':' program')+(n.e?' · $'+n.e[0]+'B':''),function(){setView({t:'funder',id:n.id,back:{t:'funders'}});},n.ds));});
+ }else if(v.t==='programs'){
+  var ps=cur.sel.slice().sort(function(a,b){return b.t-a.t;});
+  panelEl.appendChild(h('p','ptitle','Programs'));
+  panelEl.appendChild(h('p','pmeta',ps.length+' programs, largest first'));
+  ps.forEach(function(p){panelEl.appendChild(row(p.n,money(p.t),function(){setView({t:'program',n:p.n,back:{t:'programs'}});},[p.d]));});
+ }else if(v.t==='funder'){
+  var f=nodeById(v.id);
+  panelEl.appendChild(h('p','ptitle',f.id));
+  panelEl.appendChild(h('p','pmeta',f.e?'Endowment about $'+f.e[0]+'B ('+f.e[1]+')':'Endowment not found'));
+  if(f.t>0)panelEl.appendChild(h('p','pmeta','Combined size of its programs with DDF: '+money(f.t)));
+  panelEl.appendChild(h('p','sec','Programs with DDF'));
+  f.progs.forEach(function(n){var p=progByName(n);panelEl.appendChild(row(n,p?money(p.t):'',function(){setView({t:'program',n:n,back:v});},p?[p.d]:[]));});
+  var co=[];f.co.forEach(function(l){var o=l.a===f?l.b:l.a;if(co.indexOf(o)<0)co.push(o);});
+  if(co.length){panelEl.appendChild(h('p','sec','Co-funders'));
+   co.sort(function(a,b){return a.id<b.id?-1:1;}).forEach(function(o){panelEl.appendChild(row(o.id,o.e?'$'+o.e[0]+'B':'',function(){setView({t:'funder',id:o.id,back:v});},o.ds));});}
+ }else{
+  var p=progByName(v.n);
+  panelEl.appendChild(h('p','ptitle',p.n));
+  var meta=h('p','pmeta');meta.appendChild(dotEl(p.d));meta.appendChild(document.createTextNode(p.d+' · launched '+p.y+' · '+(p.t>0?money(p.t):'amount not disclosed')));
+  panelEl.appendChild(meta);
+  panelEl.appendChild(h('p','sec','Funders ('+p.f.length+')'));
+  p.f.forEach(function(id){var n=nodeById(id);if(n)panelEl.appendChild(row(id,n.e?'$'+n.e[0]+'B':'',function(){setView({t:'funder',id:id,back:v});},n.ds));});
+ }
+}
+fBtn.addEventListener('click',function(){setView(view&&view.t==='funders'?null:{t:'funders'});});
+pBtn.addEventListener('click',function(){setView(view&&view.t==='programs'?null:{t:'programs'});});
+var yrEl=document.getElementById('yr'),playBtn=document.getElementById('play'),timer=null,YEARS=[2001,2020,2021,2023,2024,2025,2026];
+function stopPlay(){if(timer){clearInterval(timer);timer=null;}yrEl.textContent='';playBtn.textContent='Play timeline';}
+function startPlay(){
+ var idx=0;playBtn.textContent='Pause';s1.value=2001;
+ function step(){
+  if(idx>=YEARS.length){stopPlay();return;}
+  s1.value=2001;s2.value=YEARS[idx];yrEl.textContent=YEARS[idx];render();idx++;
+ }
+ step();timer=setInterval(step,1500);
+}
+playBtn.addEventListener('click',function(){if(timer)stopPlay();else startPlay();});
+[sp,s1,s2].forEach(function(s){s.addEventListener('change',function(){stopPlay();render();});});
+render();
+})();
+</script>

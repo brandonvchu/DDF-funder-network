@@ -24,7 +24,11 @@ select:focus-visible{outline:2px solid var(--fg2);outline-offset:1px}
 #leg,.keys{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px}
 #leg{color:var(--fg2)} .keys{color:var(--fg3);align-items:center}
 .keys span,#leg span{display:flex;align-items:center;gap:6px}
-svg{display:block;max-width:100%;height:auto}
+svg{display:block;max-width:100%;height:auto;user-select:none;-webkit-user-select:none}
+svg g:focus{outline:none}
+svg g:focus-visible{outline:none}
+#zoom{position:absolute;bottom:8px;right:8px;display:flex;flex-direction:column;gap:4px;z-index:2}
+#zoom button{width:32px;height:32px;padding:0;font-size:18px;line-height:1}
 .wrap{position:relative;flex:0 1 760px;min-width:0;width:100%}
 #yr{position:absolute;top:0;left:0;font:300 50px/1 Helvetica,Arial,sans-serif;color:var(--yr);pointer-events:none;font-variant-numeric:tabular-nums}
 button{font:inherit;color:var(--fg);background:var(--ctl);border:1px solid var(--l2);border-radius:6px;padding:4px 12px;cursor:pointer}
@@ -76,7 +80,7 @@ details.about p{margin:6px 0 0;max-width:760px;line-height:1.5}
 <details class="about"><summary>About this data</summary>
 <p>Each dot represents a funder that has co-funded a program with DDF, sized by endowment and colored by DDF program. Darker edges connect a funder to DDF. Lighter edges connect funders in the same program. Edge width is the combined size of shared programs (log scale); dashed means the amount was not disclosed. DDF is drawn at a fixed size. Endowment figures mix endowment and total assets from 2024 to 2026.</p>
 </details>
-<div class="stage"><div class="wrap"><div id="yr" aria-hidden="true"></div><div id="tip" hidden></div><div id="stats"><button type="button" id="fbtn" class="lite"></button><button type="button" id="pbtn" class="lite"></button></div><svg id="net" viewBox="0 -60 680 760" width="100%" role="img" aria-label="Spring-layout network of DDF and co-funders clustered by program, nodes colored by DDF program and sized by endowment"><title>DDF co-funding network by program</title></svg></div><aside id="panel" hidden aria-label="Details"></aside></div>
+<div class="stage"><div class="wrap"><div id="yr" aria-hidden="true"></div><div id="tip" hidden></div><div id="stats"><button type="button" id="fbtn" class="lite"></button><button type="button" id="pbtn" class="lite"></button></div><div id="zoom"><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zout" type="button" aria-label="Zoom out">−</button></div><svg id="net" viewBox="0 -60 680 760" width="100%" role="img" aria-label="Spring-layout network of DDF and co-funders clustered by program, nodes colored by DDF program and sized by endowment"><title>DDF co-funding network by program</title></svg></div><aside id="panel" hidden aria-label="Details"></aside></div>
 <div class="keys">
 <span>Dot area = endowment:</span>
 <span><span id="l1" style="display:inline-block;border-radius:50%;background:var(--fg2)"></span>$0.5B</span>
@@ -85,7 +89,7 @@ details.about p{margin:6px 0 0;max-width:760px;line-height:1.5}
 <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--fg3)"></span>outline = not found</span>
 <span>Split circle = funds in more than one program</span>
 </div>
-<p id="info">Hover a funder, then click it for more info. Click again, or click empty space, to clear.</p>
+<p id="info">Hover a funder for a preview. Click a dot to open its details. Scroll or use + and − to zoom.</p>
 </main>
 <script>
 (function(){
@@ -115,11 +119,11 @@ function cw(t){return t>0?0.4+0.6*Math.log10(1+t):0.5;}
 function L(t){return t>0?250-30*Math.log10(1+t):260;}
 function fmt(t){return '$'+(Math.round(t*10)/10)+'M';}
 function el(t,a,p){var e=document.createElementNS(ns,t);for(var k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e;}
-var DEF='Hover a funder, then click it for more info. Click again, or click empty space, to clear.';
-var pinned=null,hov=null,curRefresh=null;
+var DEF='Hover a funder for a preview. Click a dot to open its details. Scroll or use + and − to zoom.';
+var pinned=null,hov=null,curRefresh=null,dragMoved=false,base={x:0,y:-60,w:680,h:760},vw={x:0,y:-60,w:680,h:760};
 function render(){
  pinned=null;hov=null;curRefresh=null;
- svg.setAttribute('viewBox','0 -60 680 760');
+ svg.setAttribute('viewBox','0 -60 680 760');base={x:0,y:-60,w:680,h:760};vw={x:0,y:-60,w:680,h:760};svg.style.touchAction='';
  while(svg.childNodes.length>1)svg.removeChild(svg.lastChild);
  var y1=+s1.value,y2=+s2.value,pr=sp.value;
  var sel=P.filter(function(p){return (pr==='All'||p.d===pr)&&p.y>=y1&&p.y<=y2;});
@@ -161,7 +165,7 @@ function render(){
   bx0=Math.min(bx0,left);bx1=Math.max(bx1,right);by0=Math.min(by0,n.y-n.r-4);by1=Math.max(by1,n.y+n.r+22);
  });
  var half=Math.max(cx-bx0,bx1-cx,W/2)+12,vy0=Math.min(by0-60,-60),vy1=Math.max(by1+10,H);
- svg.setAttribute('viewBox',(cx-half)+' '+vy0+' '+(2*half)+' '+(vy1-vy0));
+ svg.setAttribute('viewBox',(cx-half)+' '+vy0+' '+(2*half)+' '+(vy1-vy0));base={x:cx-half,y:vy0,w:2*half,h:vy1-vy0};vw={x:base.x,y:base.y,w:base.w,h:base.h};
  links.forEach(function(l){l.el=el('line',{x1:l.a.x,y1:l.a.y,x2:l.b.x,y2:l.b.y,'stroke-linecap':'round','stroke-width':(cw(l.t)*0.85).toFixed(2),style:'stroke:var(--fg3);stroke-opacity:0.22'+(l.t>0?'':';stroke-dasharray:2 3')});});
  for(var i=1;i<N;i++){var n=nodes[i];n.edge=el('line',{x1:cx,y1:cy,x2:n.x,y2:n.y,'stroke-linecap':'round','stroke-width':lw(n.t).toFixed(2),style:'stroke:var(--l2)'+(n.t>0?'':';stroke-dasharray:3 4')});}
  function tip(a,b,progs,t){return (a+' and '+b+': '+progs.join('; ')+(t>0?' (combined size '+fmt(t)+')':' (amount not disclosed)'));}
@@ -191,7 +195,7 @@ function render(){
    l.el.style.stroke=hot?'var(--hl)':'var(--fg3)';
    l.el.style.strokeOpacity=hot?'0.9':(f?'0.07':'0.22');
   });
-  info.textContent=f?detail(f)+(f===pinned?' Click again to clear.':''):DEF;
+  info.textContent=f?detail(f)+(f===pinned?' Click again to close.':''):DEF;
  }
  nodes.forEach(function(n,i){
   var g=el('g',{style:i?'cursor:pointer':'cursor:default'});n.g=g;
@@ -213,19 +217,38 @@ function render(){
    g.addEventListener('mouseenter',function(e){hov=n;refresh();showTip(n,e);});
    g.addEventListener('mousemove',moveTip);
    g.addEventListener('mouseleave',function(){hov=null;refresh();tipEl.hidden=true;});
-   g.addEventListener('click',function(e){e.stopPropagation();pinned=(pinned===n)?null:n;refresh();});
-   g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pinned=(pinned===n)?null:n;refresh();}});}
+   g.addEventListener('click',function(e){e.stopPropagation();if(dragMoved)return;openFunder(n);});
+   g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openFunder(n);}});}
  });
  fitHits();curRefresh=refresh;refresh();refreshPanel();
 }
-svg.addEventListener('click',function(){pinned=null;if(curRefresh)curRefresh();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){pinned=null;if(curRefresh)curRefresh();}});
+svg.addEventListener('click',function(){if(dragMoved)return;if(view&&view.t==='funder')setView(null);else{pinned=null;if(curRefresh)curRefresh();}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(view&&view.t==='funder')setView(null);else{pinned=null;if(curRefresh)curRefresh();}}});
 var view=null,cur={sel:[],nodes:[]},tipEl=document.getElementById('tip');
 function fitHits(){
  var vb=svg.viewBox.baseVal,s=(svg.clientWidth/vb.width)||1;
  cur.nodes.forEach(function(n){if(n.hit)n.hit.setAttribute('r',Math.min(Math.max(n.r+8,22/s),Math.max(n.r+8,48)));});
 }
 window.addEventListener('resize',fitHits);
+function openFunder(n){
+ tipEl.hidden=true;
+ if(view&&view.t==='funder'&&view.id===n.id){setView(null);return;}
+ setView({t:'funder',id:n.id,back:(view&&view.t!=='funder')?view:{t:'funders'}});
+}
+function clampVW(){vw.x=Math.max(base.x,Math.min(base.x+base.w-vw.w,vw.x));vw.y=Math.max(base.y,Math.min(base.y+base.h-vw.h,vw.y));}
+function applyVB(){svg.setAttribute('viewBox',vw.x+' '+vw.y+' '+vw.w+' '+vw.h);svg.style.touchAction=(vw.w<base.w-1)?'none':'';fitHits();}
+function zoomAt(f,px,py){
+ var z=base.w/vw.w,nz=Math.max(1,Math.min(6,z*f));if(nz===z)return;
+ var nw=base.w/nz,nh=base.h/nz;
+ vw.x=px-(px-vw.x)*(nw/vw.w);vw.y=py-(py-vw.y)*(nh/vw.h);vw.w=nw;vw.h=nh;clampVW();applyVB();
+}
+document.getElementById('zin').addEventListener('click',function(){zoomAt(1.4,vw.x+vw.w/2,vw.y+vw.h/2);});
+document.getElementById('zout').addEventListener('click',function(){zoomAt(1/1.4,vw.x+vw.w/2,vw.y+vw.h/2);});
+svg.addEventListener('wheel',function(e){e.preventDefault();var r=svg.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*0.0015),vw.x+(e.clientX-r.left)/r.width*vw.w,vw.y+(e.clientY-r.top)/r.height*vw.h);},{passive:false});
+var drag=null;
+svg.addEventListener('pointerdown',function(e){dragMoved=false;if(e.target.closest('g')||vw.w>=base.w-1)return;drag={x:e.clientX,y:e.clientY,vx:vw.x,vy:vw.y};});
+window.addEventListener('pointermove',function(e){if(!drag)return;var r=svg.getBoundingClientRect(),dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>4)dragMoved=true;vw.x=drag.vx-dx*vw.w/r.width;vw.y=drag.vy-dy*vw.h/r.height;clampVW();applyVB();});
+window.addEventListener('pointerup',function(){drag=null;});
 function showTip(n,e){
  tipEl.innerHTML='';
  tipEl.appendChild(h('div','tn',n.id));

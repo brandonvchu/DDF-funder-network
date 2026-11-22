@@ -54,6 +54,10 @@ button:focus-visible{outline:2px solid var(--fg2);outline-offset:1px}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
 #info{font-size:13px;color:var(--fg2);margin:0;min-height:40px;line-height:1.5}
 .note{font-size:12px;color:var(--fg3);margin:0;line-height:1.5}
+details.about{font-size:12px;color:var(--fg3)}
+details.about summary{cursor:pointer;color:var(--fg2);font-size:13px;width:fit-content}
+details.about summary:focus-visible{outline:2px solid var(--fg2);outline-offset:2px}
+details.about p{margin:6px 0 0;max-width:760px;line-height:1.5}
 </style>
 <main>
 <h1>DDF Funders Network</h1>
@@ -64,6 +68,9 @@ button:focus-visible{outline:2px solid var(--fg2);outline-offset:1px}
 <button id="play" type="button">Play timeline</button>
 </div>
 <div id="leg"></div>
+<details class="about"><summary>About this data</summary>
+<p>Each dot represents a funder that has co-funded a program with DDF, sized by endowment and colored by DDF program. Darker edges connect a funder to DDF. Lighter edges connect funders in the same program. Edge width is the combined size of shared programs (log scale); dashed means the amount was not disclosed. DDF is drawn at a fixed size. Endowment figures mix endowment and total assets from 2024 to 2026.</p>
+</details>
 <div class="stage"><div class="wrap"><div id="yr" aria-hidden="true"></div><div id="tip" hidden></div><div id="stats"><button type="button" id="fbtn" class="lite"></button><button type="button" id="pbtn" class="lite"></button></div><svg id="net" viewBox="0 -60 680 760" width="100%" role="img" aria-label="Spring-layout network of DDF and co-funders clustered by program, nodes colored by DDF program and sized by endowment"><title>DDF co-funding network by program</title></svg></div><aside id="panel" hidden aria-label="Details"></aside></div>
 <div class="keys">
 <span>Dot area = endowment:</span>
@@ -74,7 +81,6 @@ button:focus-visible{outline:2px solid var(--fg2);outline-offset:1px}
 <span>Split circle = funds in more than one program</span>
 </div>
 <p id="info">Hover a funder, then click it for more info. Click again, or click empty space, to clear.</p>
-<p class="note">Darker edges: funder to DDF. Lighter edges: funders in the same program. Edge width = combined size of shared programs (log scale); dashed = amount not disclosed. DDF is drawn at a fixed size. Endowment figures mix endowment and total assets from 2024 to 2026.</p>
 </main>
 <script>
 (function(){

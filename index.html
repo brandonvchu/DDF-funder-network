@@ -312,7 +312,7 @@ function startPlay(){
  step();timer=setInterval(step,1500);
 }
 playBtn.addEventListener('click',function(){if(timer)stopPlay();else startPlay();});
-document.getElementById('reset').addEventListener('click',function(){pinned=null;hov=null;tipEl.hidden=true;if(curRefresh)curRefresh();});
+document.getElementById('reset').addEventListener('click',function(){stopPlay();sp.value='All';s1.value=2001;s2.value=2026;render();pinned=null;hov=null;tipEl.hidden=true;if(curRefresh)curRefresh();});
 [sp,s1,s2].forEach(function(s){s.addEventListener('change',function(){stopPlay();render();});});
 sp.addEventListener('change',function(){if(sp.value!=='All')setView({t:'programs'});});
 render();
